@@ -1,41 +1,33 @@
 const path = require("path");
 const fs = require("fs");
+const feth = require("isomorphic-fetch")
 
-const chirps = [
-    {
-        user: "Ben",
-        chirp: "This is a chirp"
-    },
-    {
-        user: "Ben",
-        chirp: "This is a chirp"
-    },
-    {
-        user: "Ben",
-        chirp: "This is a chirp"
-    },
-    {
-        user: "Ben",
-        chirp: "This is a chirp"
-    },
-    {
-        user: "Ben",
-        chirp: "This is a chirp"
-    },
-];
 
-const filePath = path.join(__dirname, "/chirps.json");
 
-fs.writeFile(filePath, JSON.stringify(chirps), (err) => {
-    if(err) {
-        console.error(err)
-    }
-    console.log("Done")
-});
+const filePath = path.join(__dirname, "/popular-articles.json");
 
-fs.readFile(filePath, (err, data) => {
-    console.log(JSON.parse(data));
+fetch("https://reddit.com/r/popular.json")
+    .then((res) => res.json())
+    .then((res) => {
+        const {
+        data: { children },
+    } = res;
 
-});
+    const articles = [];
+    children.forEach(({ data: { url, title, author}}) => {
+        articles.push({ title, author, url });
+    });
+        
+    fs.writeFile(filePath, JSON.stringify(articles), (err) => {
+        if (err) {
+            console.log("error");
+            return;
+        }
+        console.log("success")
+    });
+    });
+
+
+
 
 
